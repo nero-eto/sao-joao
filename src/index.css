@@ -1,0 +1,30 @@
+/* Fontes do Google */
+@import url('https://fonts.googleapis.com/css2?family=Caprasimo&family=Outfit:wght@300;400;600;800&display=swap');
+
+/* Variáveis globais — uma paleta única, fácil de mudar tudo de uma vez */
+:root {
+  --bg: #1a0e2e;            /* roxo escuro, "céu da noite" */
+  --bg-card: #2d1a4a;       /* roxo um tom acima, pro card */
+  --ink: #fff5e6;           /* branco quente, texto principal */
+  --muted: #8a7a9e;         /* cinza-lilás, texto secundário */
+  --accent: #ff4d8d;        /* pink, pra acentos */
+  --vamos: #ffd23f;         /* amarelo fogueira */
+  --pensando: #ff8c42;      /* laranja */
+  --naovamos: #6e5d80;      /* roxo apagado */
+}
+
+/* Reset básico */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Outfit', system-ui, sans-serif;
+  min-height: 100vh;
+  padding-bottom: 60px;
+}
+
