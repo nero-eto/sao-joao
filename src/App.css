@@ -131,3 +131,66 @@
 .badge-vamos    { background: var(--vamos);    color: var(--bg); }
 .badge-pensando { background: var(--pensando); color: var(--bg); }
 .badge-naovamos { background: var(--naovamos); color: var(--ink); }
+
+.header .local {
+  color: var(--muted);
+  font-size: 14px;
+  max-width: 500px;
+  margin: 12px auto 0;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+.boas-vindas {
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.boas-vindas h1 {
+  font-family: 'Caprasimo', cursive;
+  font-size: 36px;
+  color: var(--vamos);
+  margin-bottom: 30px;
+  text-shadow: 3px 3px 0 var(--accent);
+}
+
+.boas-vindas button {
+  display: block;
+  margin: 12px auto;
+  padding: 14px 40px;
+  font-size: 18px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  letter-spacing: 1px;
+  background: var(--bg-card);
+  color: var(--ink);
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 200px;
+}
+
+.boas-vindas button:hover {
+  background: var(--accent);
+  transform: scale(1.05);
+}
+.trocar-usuario {
+  margin-top: 16px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-family: inherit;
+  font-weight: 600;
+  letter-spacing: 1px;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--muted);
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.trocar-usuario:hover {
+  color: var(--ink);
+  border-color: var(--accent);
+}

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import "./App.css";
+import { supabase } from "./supabase";
 
 const DIAS = [
   { data: "29/05", dow: "Sexta", atracoes: ["Fogo na Saia", "Seu Desejo", "Calcinha Preta"], palco360: "Chirlys Trindade" },
@@ -78,6 +79,27 @@ function DiaCard({ data, dow, atracoes, palco360 }) {
 }
 
 function App() {
+  const [usuario, setUsuario] = useState(() => localStorage.getItem("usuario") || "");
+
+  function trocarUsuario() {
+    localStorage.removeItem("usuario");
+    setUsuario("");
+  }
+
+  if (!usuario) {
+    return (
+      <div className="boas-vindas">
+        <h1>Quem é você?</h1>
+        <button onClick={() => { localStorage.setItem("usuario", "neno"); setUsuario("neno"); }}>
+          Neno
+        </button>
+        <button onClick={() => { localStorage.setItem("usuario", "marie"); setUsuario("marie"); }}>
+          Marie
+        </button>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="bandeirola"></div>
@@ -85,13 +107,17 @@ function App() {
       <header className="header">
         <div className="subtitulo">Arraiá do povo 2026</div>
         <h1>Nosso São João</h1>
-        <div className="local">Fiz com amor para nos ajudar a escolher 
+        <div className="local">
+          Fiz com amor para nos ajudar a escolher
           os dias que nós vamos para os shows minha estrelinha radiante.
         </div>
+        <button className="trocar-usuario" onClick={trocarUsuario}>
+          Você é {usuario === "neno" ? "Neno" : "Marie"} · trocar
+        </button>
       </header>
 
       <div className="grid">
-        {DIAS.map(dia => <DiaCard key={dia.data} {...dia} />)}
+        {DIAS.map(dia => <DiaCard key={dia.data} {...dia} usuario={usuario} />)}
       </div>
     </>
   );
