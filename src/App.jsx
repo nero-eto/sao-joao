@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import "./App.css";
 import { supabase } from "./supabase";
+import "./App.css";
 
 const DIAS = [
   { data: "29/05", dow: "Sexta", atracoes: ["Fogo na Saia", "Seu Desejo", "Calcinha Preta"], palco360: "Chirlys Trindade" },
@@ -33,31 +33,83 @@ const DIAS = [
 ];
 
 const EMOJIS = {
-  vamos: "🔥 VAMO NOIZE MEU AMO",
-  pensando: "🤔 TAMO PENSANDO",
-  naovamos: "🚫 NÃO VAMOS NESSE DIA",
+  vamos: "🔥 VAMOS",
+  pensando: "🤔 PENSANDO",
+  naovamos: "🚫 NÃO VAMOS",
 };
 
-function DiaCard({ data, dow, atracoes, palco360 }) {
-  const chaveStorage = `dia-${data}`;
+function DiaCard({ data, dow, atracoes, palco360, usuario }) {
+  const [meuStatus, setMeuStatus] = useState("nenhum");
+  const [statusOutro, setStatusOutro] = useState("nenhum");
 
-  const [status, setStatus] = useState(() => {
-    const salvo = localStorage.getItem(chaveStorage);
-    return salvo || "nenhum";
-  });
+  const outro = usuario === "neno" ? "marie" : "neno";
 
   useEffect(() => {
-    localStorage.setItem(chaveStorage, status);
-  }, [status, chaveStorage]);
+    async function carregar() {
+      const { data: rows, error } = await supabase
+        .from("marcacoes")
+        .select("usuario, status")
+        .eq("dia", data);
 
-  function ciclar() {
+      if (error) {
+        console.error("Erro ao carregar:", error);
+        return;
+      }
+
+      const meu = rows.find(r => r.usuario === usuario);
+      const dela = rows.find(r => r.usuario === outro);
+      if (meu) setMeuStatus(meu.status);
+      if (dela) setStatusOutro(dela.status);
+    }
+    carregar();
+  }, [data, usuario, outro]);
+
+  useEffect(() => {
+    const canal = supabase
+      .channel(`marcacoes-${data}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "marcacoes",
+          filter: `dia=eq.${data}`,
+        },
+        (payload) => {
+          const row = payload.new || payload.old;
+          if (!row) return;
+
+          if (row.usuario === usuario) {
+            setMeuStatus(payload.new?.status || "nenhum");
+          } else if (row.usuario === outro) {
+            setStatusOutro(payload.new?.status || "nenhum");
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(canal);
+    };
+  }, [data, usuario, outro]);
+
+  async function ciclar() {
     const CICLO = ["nenhum", "vamos", "pensando", "naovamos"];
-    const proximoIndice = (CICLO.indexOf(status) + 1) % CICLO.length;
-    setStatus(CICLO[proximoIndice]);
+    const proximo = CICLO[(CICLO.indexOf(meuStatus) + 1) % CICLO.length];
+    setMeuStatus(proximo);
+
+    const { error } = await supabase
+      .from("marcacoes")
+      .upsert(
+        { dia: data, usuario, status: proximo },
+        { onConflict: "dia,usuario" }
+      );
+
+    if (error) console.error("Erro ao salvar:", error);
   }
 
   return (
-    <div className={`card status-${status}`} onClick={ciclar}>
+    <div className={`card status-${meuStatus}`} onClick={ciclar}>
       <div className="card-data">{data}</div>
       <div className="card-dow">{dow}</div>
 
@@ -71,9 +123,14 @@ function DiaCard({ data, dow, atracoes, palco360 }) {
         </div>
       )}
 
-      {status !== "nenhum" && (
-        <span className={`badge badge-${status}`}>{EMOJIS[status]}</span>
-      )}
+      <div className="status-row">
+        {meuStatus !== "nenhum" && (
+          <span className={`badge badge-${meuStatus}`}>VC: {EMOJIS[meuStatus]}</span>
+        )}
+        {statusOutro !== "nenhum" && (
+          <span className={`badge badge-${statusOutro}`}>{outro}: {EMOJIS[statusOutro]}</span>
+        )}
+      </div>
     </div>
   );
 }
